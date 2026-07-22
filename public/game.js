@@ -13,32 +13,53 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-// Web Audio API Context
 let audioCtx;
 let panner;
 
 function preload() {
-    // Aquí cargaremos los sonidos más adelante
     console.log("Cargando assets de audio...");
 }
 
 function create() {
-    this.add.text(400, 300, 'Echoes of the Blind', { fontSize: '48px', fill: '#ffffff' }).setOrigin(0.5);
+    this.add.text(400, 300, 'Click para sonido 3D', { fontSize: '32px', fill: '#ffffff' }).setOrigin(0.5);
     
     // Inicializar Web Audio API
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
-    // Configurar el PannerNode para audio 3D
+    // Configurar el PannerNode
     panner = audioCtx.createPanner();
     panner.panningModel = 'HRTF';
     panner.distanceModel = 'inverse';
-    panner.refDistance = 1;
-    panner.maxDistance = 10000;
-    panner.rolloffFactor = 1;
     
-    console.log("Motor de Audio 3D iniciado.");
+    // Evento para activar sonido
+    this.input.on('pointerdown', (pointer) => {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        playSound(pointer.x, pointer.y);
+    });
 }
 
-function update() {
-    // Aquí actualizaremos la posición del panner basada en la posición del enemigo/jugador
+function playSound(x, y) {
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+    
+    // Posicionar el sonido en el espacio basado en donde haces clic
+    const pan = (x / 800) * 2 - 1; // mapea 0-800 a -1 a 1
+    panner.positionX.setValueAtTime(pan, audioCtx.currentTime);
+    
+    oscillator.connect(panner);
+    panner.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+    
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.5);
 }
+
+function update() {}
