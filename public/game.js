@@ -25,9 +25,11 @@ function preload() {}
 function create() {
     this.add.text(this.scale.width/2, 50, 'Usa Flechas/WASD para moverte y saltar', { fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);
 
-    // Plataformas
+    // Plataformas (dibujadas como rectángulos para que sean visibles)
     platforms = this.physics.add.staticGroup();
-    platforms.create(this.scale.width/2, this.scale.height - 50, 'ground').setScale(2).refreshBody();
+    let ground = this.add.rectangle(this.scale.width/2, this.scale.height - 25, this.scale.width, 50, 0x333333);
+    this.physics.add.existing(ground, true);
+    platforms.add(ground);
 
     // Jugador
     player = this.add.rectangle(this.scale.width/2, this.scale.height - 150, 32, 48, 0x00ffff);
