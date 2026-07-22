@@ -23,7 +23,7 @@ let player;
 function preload() {}
 
 function create() {
-    this.add.text(this.scale.width/2, 50, 'Toca la pantalla para moverte', { fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);
+    this.add.text(this.scale.width/2, 50, 'Toca o haz clic para moverte', { fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);
     
     player = this.add.rectangle(this.scale.width/2, this.scale.height/2, 50, 50, 0x00ffff);
     this.physics.add.existing(player);
