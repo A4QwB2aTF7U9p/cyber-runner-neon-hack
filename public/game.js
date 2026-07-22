@@ -3,6 +3,10 @@ const config = {
     width: 800,
     height: 600,
     parent: 'game',
+    physics: {
+        default: 'arcade',
+        arcade: { gravity: { y: 0 }, debug: false }
+    },
     scene: {
         preload: preload,
         create: create,
@@ -11,22 +15,26 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+let player;
+let cursors;
 
-function preload() {
-    // Aquí cargarás tus sprites (assets/sprites/...)
-    console.log("Cargando assets...");
-}
+function preload() {}
 
 function create() {
-    // Fondo de pantalla o mensaje de bienvenida
-    this.add.text(400, 300, 'Cyber-Runner: Neon Hack', {
-        fontSize: '48px',
-        fill: '#ff00ff'
-    }).setOrigin(0.5);
+    this.add.text(400, 50, 'Cyber-Runner: Neon Hack', { fontSize: '32px', fill: '#ff00ff' }).setOrigin(0.5);
     
-    console.log("Juego iniciado");
+    player = this.add.rectangle(400, 300, 32, 32, 0x00ffff);
+    this.physics.add.existing(player);
+    player.body.setCollideWorldBounds(true);
+    
+    cursors = this.input.keyboard.createCursorKeys();
 }
 
 function update() {
-    // Lógica del juego
+    player.body.setVelocity(0);
+    if (cursors.left.isDown) player.body.setVelocityX(-200);
+    else if (cursors.right.isDown) player.body.setVelocityX(200);
+    
+    if (cursors.up.isDown) player.body.setVelocityY(-200);
+    else if (cursors.down.isDown) player.body.setVelocityY(200);
 }
