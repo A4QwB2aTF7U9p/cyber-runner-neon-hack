@@ -8,7 +8,7 @@ const config = {
     },
     physics: {
         default: 'arcade',
-        arcade: { gravity: { y: 0 }, debug: false }
+        arcade: { gravity: { y: 800 }, debug: false }
     },
     scene: {
         preload: preload,
@@ -18,28 +18,32 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
-let player;
+let player, platforms, cursors;
 
 function preload() {}
 
 function create() {
-    this.add.text(this.scale.width/2, 50, 'Toca o haz clic para moverte', { fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);
-    
-    player = this.add.rectangle(this.scale.width/2, this.scale.height/2, 50, 50, 0x00ffff);
+    this.add.text(this.scale.width/2, 50, 'Usa Flechas/WASD para moverte y saltar', { fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);
+
+    // Plataformas
+    platforms = this.physics.add.staticGroup();
+    platforms.create(this.scale.width/2, this.scale.height - 50, 'ground').setScale(2).refreshBody();
+
+    // Jugador
+    player = this.add.rectangle(this.scale.width/2, this.scale.height - 150, 32, 48, 0x00ffff);
     this.physics.add.existing(player);
     player.body.setCollideWorldBounds(true);
+    this.physics.add.collider(player, platforms);
 
-    this.input.on('pointerdown', (pointer) => {
-        this.physics.moveToObject(player, pointer, 500);
-    });
+    cursors = this.input.keyboard.createCursorKeys();
 }
 
 function update() {
-    // Si el jugador está muy cerca del objetivo, detenerlo
-    if (player.body.speed > 0) {
-        const distance = Phaser.Math.Distance.Between(player.x, player.y, player.body.x + player.body.width/2, player.body.y + player.body.height/2);
-        if (distance < 10) {
-            player.body.reset(player.x, player.y);
-        }
+    player.body.setVelocityX(0);
+    if (cursors.left.isDown) player.body.setVelocityX(-200);
+    else if (cursors.right.isDown) player.body.setVelocityX(200);
+
+    if (cursors.up.isDown && player.body.touching.down) {
+        player.body.setVelocityY(-500);
     }
 }
