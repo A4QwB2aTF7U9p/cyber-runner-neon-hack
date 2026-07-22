@@ -5,6 +5,7 @@ require('dotenv').config();
 // Si estamos en producción (Railway), solemos necesitar SSL habilitado.
 const isProduction = process.env.NODE_ENV === 'production' || !!process.env.RAILWAY_ENVIRONMENT;
 
+console.log('DEBUG: DATABASE_URL value:', process.env.DATABASE_URL);
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: isProduction ? { rejectUnauthorized: false } : false
