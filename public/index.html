@@ -2,15 +2,51 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Cyber-Runner: Neon Hack</title>
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskManager Pro</title>
     <style>
-        body { margin: 0; padding: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        canvas { border: 2px solid #ff00ff; }
+        :root { --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --accent: #bb86fc; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; }
+        .card { background: var(--card); padding: 15px; margin-bottom: 10px; border-radius: 10px; display: flex; align-items: center; gap: 10px; }
+        .card.done { opacity: 0.6; text-decoration: line-through; }
+        input, textarea, button { width: 100%; margin: 5px 0; padding: 10px; border-radius: 5px; border: 1px solid #333; background: #2c2c2c; color: white; }
+        button { background: var(--accent); color: black; font-weight: bold; cursor: pointer; }
+        .flex { flex-grow: 1; }
     </style>
 </head>
 <body>
-    <div id="game"></div>
-    <script src="game.js" defer></script>
+    <div class="container">
+        <h1>TaskManager</h1>
+        <input type="text" id="title" placeholder="Título (obligatorio)">
+        <textarea id="desc" placeholder="Descripción"></textarea>
+        <input type="time" id="time">
+        <button onclick="add()">Agregar Tarea</button>
+        <div id="list"></div>
+    </div>
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        function render() {
+            document.getElementById('list').innerHTML = tasks.map((t, i) => `
+                <div class="card ${t.done ? 'done' : ''}">
+                    <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggle(${i})">
+                    <div class="flex"><strong>${t.title}</strong> (${t.time})<br><small>${t.desc}</small></div>
+                    <button onclick="del(${i})" style="width:auto; background:red; padding:5px;">X</button>
+                </div>
+            `).join('');
+        }
+        function add() {
+            const title = document.getElementById('title').value;
+            if (!title) return alert("El título es obligatorio");
+            tasks.push({title: title, desc:document.getElementById('desc').value, time:document.getElementById('time').value, done: false});
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            render();
+            document.getElementById('title').value = '';
+            document.getElementById('desc').value = '';
+        }
+        function toggle(i) { tasks[i].done = !tasks[i].done; localStorage.setItem('tasks', JSON.stringify(tasks)); render(); }
+        function del(i) { if(confirm('¿Borrar tarea?')) { tasks.splice(i,1); localStorage.setItem('tasks', JSON.stringify(tasks)); render(); } }
+        render();
+    </script>
 </body>
 </html>
